@@ -1,2 +1,0 @@
-require("./environment");
-require("./directories");
