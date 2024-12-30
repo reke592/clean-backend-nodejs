@@ -11,6 +11,7 @@ const http = require("http");
 // routes
 router.use("/device-a", require("./api/controllers/device-a"));
 router.use("/device-b", require("./api/controllers/device-b"));
+router.use("*", require("./api/middlewares/error-handler"));
 
 // server configurations
 app.set("trust proxy", TRUST_PROXY);

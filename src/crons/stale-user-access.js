@@ -1,18 +1,16 @@
+const { logger } = require("../helpers/logging");
 const { CRON_CHECK_STALE_USER_ACCESS } = require("../startup/environment");
-const debug = require("debug")("app:crons:stale-user-access");
 const cron = require("node-cron");
 
-debug("starting cron schedule..");
+logger.info(`starting cron: stale-user-access ${CRON_CHECK_STALE_USER_ACCESS}`);
 const schedule = cron.schedule(CRON_CHECK_STALE_USER_ACCESS, async () => {
-  debug("check stale user access");
+  logger.info("check stale user access");
 });
 
-process.on("SIGINT", () => {
-  debug("stopping cron schedule..");
+const shutdown = (signal) => () => {
+  logger.warn("stopping cron: stale-user-access");
   schedule.stop();
-});
+};
 
-process.on("SIGTERM", () => {
-  debug("stopping cron schedule..");
-  schedule.stop();
-});
+process.on("SIGINT", shutdown("SIGINT"));
+process.on("SIGTERM", shutdown("SIGINT"));
