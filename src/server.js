@@ -15,7 +15,12 @@ router.use("*", require("./api/middlewares/error-handler"));
 
 // server configurations
 app.set("trust proxy", TRUST_PROXY);
-
+// disable server tokens
+app.set("x-powered-by", false);
+// parse request body as json
+app.use(express.json());
+// log requests and responses, see .env.sample
+app.use(require("./api/middlewares/request-logging"));
 // prefix all routes with /api
 app.use("/api", router);
 

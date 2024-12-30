@@ -13,4 +13,12 @@ const cronScheduleOrDefault = (value, defaultValue) => {
   }
 };
 
-module.exports = { numberOrDefault, cronScheduleOrDefault };
+const isAgreed = (value) => {
+  return value === "true" || value === "yes" || value === "1";
+};
+
+module.exports = {
+  numberOrDefault,
+  cronScheduleOrDefault,
+  isAgreed,
+};

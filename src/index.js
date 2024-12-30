@@ -79,6 +79,12 @@ if (cluster.isPrimary) {
       `Worker PID ${worker.process.pid} exited with code ${code}, signal ${signal}`
     );
     onlineWorkers--;
+
+    // attempt to respawn the worker
+    if (!signal && code == 1) {
+      logger.warn("respawn worker");
+      cluster.fork();
+    }
   });
 
   process.on("SIGTERM", gracefulShutdown("SIGTERM"));

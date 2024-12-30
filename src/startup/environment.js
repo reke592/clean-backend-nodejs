@@ -4,6 +4,7 @@ const envFile = process.argv[2] || ".env";
 const {
   numberOrDefault,
   cronScheduleOrDefault,
+  isAgreed,
 } = require("../helpers/value_parsers");
 const { mkdirSync } = require("../helpers/directories");
 
@@ -67,6 +68,11 @@ const CRON_CHECK_STALE_USER_ACCESS = cronScheduleOrDefault(
   "*/5 * * * * *"
 );
 
+/**
+ * Log requests, default is false
+ */
+const LOG_REQUESTS = isAgreed(process.env.LOG_REQUESTS);
+
 module.exports = {
   isProduction,
   SERV_PORT,
@@ -79,4 +85,5 @@ module.exports = {
   LOG_RETENTION,
   DATA_DIR,
   CRON_CHECK_STALE_USER_ACCESS,
+  LOG_REQUESTS,
 };
