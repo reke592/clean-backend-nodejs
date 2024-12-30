@@ -12,6 +12,8 @@ if (fs.existsSync(envFile)) {
   require("dotenv").config({ path: envFile });
 }
 
+const isProduction = process.env.NODE_ENV === "production";
+
 /**
  * Server port, default is 3000
  */
@@ -38,6 +40,21 @@ const ROOT_DIR = path.resolve(path.join(__dirname, "..", ".."));
 const LOGS_DIR = mkdirSync(process.env.LOGS_DIR || path.join(ROOT_DIR, "logs"));
 
 /**
+ * Maximum size of a log file, default is 20m
+ */
+const LOG_MAX_SIZE = numberOrDefault(process.env.LOG_MAX_SIZE, "20m");
+
+/**
+ * Log retention, default is 14d
+ */
+const LOG_RETENTION = numberOrDefault(process.env.LOG_RETENTION, "14d");
+
+/**
+ * Log filename, default is app.log
+ */
+const LOG_FILENAME = process.env.LOG_FILENAME || "app.log";
+
+/**
  * Data directory
  */
 const DATA_DIR = mkdirSync(process.env.DATA_DIR || path.join(ROOT_DIR, "data"));
@@ -51,11 +68,15 @@ const CRON_CHECK_STALE_USER_ACCESS = cronScheduleOrDefault(
 );
 
 module.exports = {
+  isProduction,
   SERV_PORT,
   CLUSTER_SIZE,
   TRUST_PROXY,
   ROOT_DIR,
   LOGS_DIR,
+  LOG_FILENAME,
+  LOG_MAX_SIZE,
+  LOG_RETENTION,
   DATA_DIR,
   CRON_CHECK_STALE_USER_ACCESS,
 };

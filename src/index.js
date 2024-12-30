@@ -21,10 +21,10 @@ let onlineWorkers = 0;
  */
 const gracefulShutdown = (signal) => () => {
   if (cluster.isPrimary) {
-    logger.info(`Received ${signal}. Shutting down gracefully.`);
+    logger.warn(`Received ${signal}. Shutting down gracefully.`);
 
     let timeout = 10;
-    logger.info(
+    logger.warn(
       `Waiting for ${onlineWorkers} worker/s to shutdown. timeout: ${timeout}s`
     );
 
@@ -35,7 +35,7 @@ const gracefulShutdown = (signal) => () => {
     setInterval(() => {
       timeout -= 1;
       if (timeout === 0) {
-        logger.info("Forcing shutdown");
+        logger.warn("Forcing shutdown");
         process.exit(1);
       } else if (onlineWorkers === 0) {
         process.exit(0);
@@ -75,7 +75,7 @@ if (cluster.isPrimary) {
   });
 
   cluster.on("exit", (worker, code, signal) => {
-    logger.info(
+    logger.warn(
       `Worker PID ${worker.process.pid} exited with code ${code}, signal ${signal}`
     );
     onlineWorkers--;
