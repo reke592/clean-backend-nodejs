@@ -1,0 +1,32 @@
+services:
+  # nodejs backend
+  app-backend:
+    image: node:20.18.0-alpine
+    env_file:
+      - .env
+    volumes:
+      - ./src:/app/src
+      - ./package.json:/app/package.json
+      - ./package-lock.json:/app/package-lock.json
+      - ./node_modules:/app/node_modules
+      - ./.container/logs:/app/logs
+      - ./.container/data:/app/data
+    ports:
+      - "4000:4000"
+    working_dir: /app
+    command: npm run dev
+
+  # reverse proxy
+  nginx:
+    profiles:
+      - donotstart
+    image: nginx:1.27.3-alpine
+    volumes:
+      - ./backend-nginx.conf:/etc/nginx/templates/default.conf.template
+      - ./.container/nginx/logs:/var/log/nginx
+    environment:
+      - BACKEND_SERVER=app-backend:4000
+      - SERVER_NAME=localhost
+      - NGINX_PORT=80
+    ports:
+      - "80:80"
