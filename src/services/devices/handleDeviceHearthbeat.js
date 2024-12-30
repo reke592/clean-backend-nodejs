@@ -1,4 +1,5 @@
 const { COMMAND_OPTIONS } = require("../../helpers/constants");
+const { logger } = require("../../helpers/logging");
 
 const PARAMS = {
   /**
@@ -15,7 +16,7 @@ const handleDeviceHearthbeat = async (
   params = PARAMS,
   options = COMMAND_OPTIONS
 ) => {
-  console.log("Device hearthbeat", params);
+  logger.info("Device hearthbeat", params);
 };
 
 module.exports = { handleDeviceHearthbeat };

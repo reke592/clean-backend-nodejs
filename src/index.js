@@ -1,5 +1,6 @@
 const { CLUSTER_SIZE, SERV_PORT } = require("./startup/environment");
 const server = require("./server");
+const { logger } = require("./helpers/logging");
 
 // better to use cluster module to take advantage of multi-core systems
 // downside is that it's a bit more complex to manage and TLS is not supported
@@ -20,10 +21,10 @@ let onlineWorkers = 0;
  */
 const gracefulShutdown = (signal) => () => {
   if (cluster.isPrimary) {
-    console.log(`Received ${signal}. Shutting down gracefully.`);
+    logger.info(`Received ${signal}. Shutting down gracefully.`);
 
     let timeout = 10;
-    console.log(
+    logger.info(
       `Waiting for ${onlineWorkers} worker/s to shutdown. timeout: ${timeout}s`
     );
 
@@ -34,7 +35,7 @@ const gracefulShutdown = (signal) => () => {
     setInterval(() => {
       timeout -= 1;
       if (timeout === 0) {
-        console.log("Forcing shutdown");
+        logger.info("Forcing shutdown");
         process.exit(1);
       } else if (onlineWorkers === 0) {
         process.exit(0);
@@ -49,10 +50,10 @@ const gracefulShutdown = (signal) => () => {
 
 if (cluster.isPrimary) {
   const numCPUs = require("os").cpus().length;
-  console.log(`Master PID ${process.pid} is running`);
+  logger.info(`Master PID ${process.pid} is running`);
 
   if (CLUSTER_SIZE > numCPUs) {
-    console.log(
+    logger.info(
       `${CLUSTER_SIZE} is greater than available CPUs ${numCPUs}. Using ${numCPUs} instead`
     );
   }
@@ -62,7 +63,7 @@ if (cluster.isPrimary) {
   }
 
   cluster.on("online", (worker) => {
-    console.log(
+    logger.info(
       `Worker PID ${worker.process.pid} is online, listening on port ${SERV_PORT}`
     );
     onlineWorkers++;
@@ -74,7 +75,7 @@ if (cluster.isPrimary) {
   });
 
   cluster.on("exit", (worker, code, signal) => {
-    console.log(
+    logger.info(
       `Worker PID ${worker.process.pid} exited with code ${code}, signal ${signal}`
     );
     onlineWorkers--;

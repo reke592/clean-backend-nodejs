@@ -9,7 +9,6 @@ const cronScheduleOrDefault = (value, defaultValue) => {
   try {
     return cron.validate(value) ? value : defaultValue;
   } catch (error) {
-    console.log(error)
     return defaultValue;
   }
 };
