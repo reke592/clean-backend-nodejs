@@ -16,7 +16,7 @@ client.on("error", (err) => {
 implement.getOrDefault = async (key, cbOrValue, expire) => {
   // prevent backend from crashing if redis is not ready
   if (!isReady) {
-    return cbOrValue;
+    return typeof cbOrValue === "function" ? await cbOrValue() : cbOrValue;
   }
 
   let value = await client.get(key);
