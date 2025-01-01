@@ -18,6 +18,9 @@ exports.config = { transaction: false };
  */
 exports.up = function (knex) {
   // deployment process
+  return Promise.all([
+    
+  ]);
 };
 
 /**
@@ -25,6 +28,9 @@ exports.up = function (knex) {
  */
 exports.down = function (knex) {
   // rollback process
+  return Promise.all([
+    
+  ]);
 };
 `.trim();
 
