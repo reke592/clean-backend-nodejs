@@ -1,10 +1,24 @@
+const { PublicError } = require("../../helpers/errors");
 const { logger } = require("../../helpers/logging");
 
 module.exports = async (error, req, res, next) => {
-  logger.error(error);
+  // always log the error
+  logger.error(error.stack);
 
-  // TODO: consolidate reponse based on error type
-
-  // return static message for internal server errors
-  res.status(500).send("Internal server error");
+  // if the error is a PublicError, return the error message
+  if (error instanceof PublicError) {
+    res.status(error.statusCode).json({
+      error: error.name,
+      code: error.statusCode,
+      message: error.message,
+    });
+  } else {
+    // return static message for internal server errors
+    // TODO: send stacktrace to real-time monitoring service
+    res.status(500).json({
+      error: "InternalServerError",
+      code: 500,
+      message: "Internal server error",
+    });
+  }
 };
