@@ -53,7 +53,7 @@ if (cluster.isPrimary) {
   logger.info(`Master PID ${process.pid} is running`);
 
   if (CLUSTER_SIZE > numCPUs) {
-    logger.info(
+    logger.warn(
       `${CLUSTER_SIZE} is greater than available CPUs ${numCPUs}. Using ${numCPUs} instead`
     );
   }
