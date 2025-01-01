@@ -5,6 +5,7 @@ const {
   numberOrDefault,
   cronScheduleOrDefault,
   isAgreed,
+  matchedOrDefault,
 } = require("../helpers/value_parsers");
 const { mkdirSync } = require("../helpers/directories");
 
@@ -43,12 +44,20 @@ const LOGS_DIR = mkdirSync(process.env.LOGS_DIR || path.join(ROOT_DIR, "logs"));
 /**
  * Maximum size of a log file, default is 20m
  */
-const LOG_MAX_SIZE = numberOrDefault(process.env.LOG_MAX_SIZE, "20m");
+const LOG_MAX_SIZE = matchedOrDefault(
+  process.env.LOG_MAX_SIZE,
+  /^\d+[k|m|g]b?$/,
+  "20m"
+);
 
 /**
- * Log retention, default is 14d
+ * Log retention, number of files or days. default is 14d
  */
-const LOG_RETENTION = numberOrDefault(process.env.LOG_RETENTION, "14d");
+const LOG_RETENTION = matchedOrDefault(
+  process.env.LOG_RETENTION,
+  /^\d+[d]?$/,
+  "14d"
+);
 
 /**
  * Log filename, default is app.log

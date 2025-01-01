@@ -5,6 +5,10 @@ const numberOrDefault = (value, defaultValue) => {
   return isNaN(number) ? defaultValue : number;
 };
 
+const matchedOrDefault = (value, regex, defaultValue) => {
+  return regex.test(value || "") ? value : defaultValue;
+};
+
 const cronScheduleOrDefault = (value, defaultValue) => {
   try {
     return cron.validate(value) ? value : defaultValue;
@@ -19,6 +23,7 @@ const isAgreed = (value) => {
 
 module.exports = {
   numberOrDefault,
+  matchedOrDefault,
   cronScheduleOrDefault,
   isAgreed,
 };
