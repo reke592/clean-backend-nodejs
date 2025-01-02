@@ -70,6 +70,11 @@ const LOG_FILENAME = process.env.LOG_FILENAME || "app.log";
 const DATA_DIR = mkdirSync(process.env.DATA_DIR || path.join(ROOT_DIR, "data"));
 
 /**
+ * run cron index.js as a sub process, default is false
+ */
+const CRON_AS_DAEMON = isAgreed(process.env.CRON_AS_DAEMON);
+
+/**
  * cron schedule to check stale user access, default is every 5 seconds
  */
 const CRON_CHECK_STALE_USER_ACCESS = cronScheduleOrDefault(
@@ -93,6 +98,7 @@ module.exports = {
   LOG_MAX_SIZE,
   LOG_RETENTION,
   DATA_DIR,
+  CRON_AS_DAEMON,
   CRON_CHECK_STALE_USER_ACCESS,
   LOG_REQUESTS,
 };

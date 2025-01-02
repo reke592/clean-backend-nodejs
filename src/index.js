@@ -1,4 +1,8 @@
-const { CLUSTER_SIZE, SERV_PORT } = require("./startup/environment");
+const {
+  CLUSTER_SIZE,
+  SERV_PORT,
+  CRON_AS_DAEMON,
+} = require("./startup/environment");
 const server = require("./server");
 const { logger } = require("./helpers/logging");
 
@@ -8,11 +12,41 @@ const { logger } = require("./helpers/logging");
 // if we need socket.io, we need to use sticky sessions or redis or socket.io-redis for ipc between workers
 // if we implement caching, we need to use a shared cache like redis or node-cache (the problem with node-cache is that it's in-memory)
 const cluster = require("cluster").default || require("cluster");
+const child_process = require("child_process");
 
 /**
  * Number of online workers
  */
 let onlineWorkers = 0;
+
+/**
+ * @type {child_process.ChildProcess[]} list of subprocesses
+ */
+const children = [];
+
+/**
+ * start a child process, automatically respawn if needed
+ * @param {*} script filename
+ * @param {*} enable flag to enable the child process
+ */
+const startChild = (script, enable, respawn = true) => {
+  if (enable) {
+    let child = child_process.fork(script);
+    child.on("spawn", () => {
+      logger.info(`PID ${child.pid} spawned, script: ${script}`);
+    });
+    child.on("exit", (code) => {
+      children.pop(child);
+      if (code != 0 && respawn) {
+        logger.warn(`PID ${child.pid} exited with code ${code}, respawning..`);
+        child = child_process.fork(script);
+        children.push(child);
+      }
+    });
+  } else {
+    logger.warn(`${script} is disabled`);
+  }
+};
 
 /**
  * Gracefully shutdown the server
@@ -28,8 +62,13 @@ const gracefulShutdown = (signal) => () => {
       `Waiting for ${onlineWorkers} worker/s to shutdown. timeout: ${timeout}s`
     );
 
+    // for old node versions, we need to propagate the kill signal to workers and subprocesses
     for (const id in cluster.workers) {
       cluster.workers[id].kill(signal);
+    }
+
+    for (const child of children) {
+      child.kill(signal);
     }
 
     setInterval(() => {
@@ -64,19 +103,19 @@ if (cluster.isPrimary) {
 
   cluster.on("online", (worker) => {
     logger.info(
-      `Worker PID ${worker.process.pid} is online, listening on port ${SERV_PORT}`
+      `PID ${worker.process.pid} is online, listening on port ${SERV_PORT}`
     );
     onlineWorkers++;
 
-    // start crons when all workers are online
+    // start subprocesses when all workers are online
     if (onlineWorkers === Math.min(CLUSTER_SIZE, numCPUs)) {
-      require("./crons");
+      startChild("./src/crons", CRON_AS_DAEMON);
     }
   });
 
   cluster.on("exit", (worker, code, signal) => {
     logger.warn(
-      `Worker PID ${worker.process.pid} exited with code ${code}, signal ${signal}`
+      `PID ${worker.process.pid} exited with code ${code}, signal ${signal}`
     );
     onlineWorkers--;
 

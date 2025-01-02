@@ -13,7 +13,7 @@ const { logger } = require("../helpers/logging");
  */
 const crons = [];
 
-logger.info(`Scanning for cron jobs..`);
+logger.info(`PID ${process.pid} scanning for cron jobs..`);
 for (let file of fs.readdirSync(__dirname)) {
   if (file === "index.js" || !file.endsWith(".js")) {
     continue;
@@ -38,7 +38,9 @@ for (let file of fs.readdirSync(__dirname)) {
 }
 
 const shutdown = (signal) => async () => {
-  logger.warn("Stopping cron schedules.");
+  logger.warn(
+    `PID ${process.pid} received ${signal}, Stopping cron schedules.`
+  );
   for (let item of crons) {
     item.job.stop();
   }
