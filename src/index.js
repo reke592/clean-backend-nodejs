@@ -89,6 +89,9 @@ if (cluster.isPrimary) {
 
   process.on("SIGTERM", gracefulShutdown("SIGTERM"));
   process.on("SIGINT", gracefulShutdown("SIGINT"));
+  process.on("exit", (code) => {
+    logger.warn(`Master PID ${process.pid} exited with code ${code}`);
+  });
 } else {
   server.listen(SERV_PORT);
 }
