@@ -1,8 +1,8 @@
 /**
  * get or set value to cache
- * @param {*} key unique key
+ * @param {string} key unique key
  * @param {*} cbOrValue callback function or value
- * @param {*} expire in seconds
+ * @param {number} expire in seconds
  */
 const getOrDefault = async (key, cbOrValue, expire) => {
   throw new Error("Method not implemented.");
@@ -10,7 +10,7 @@ const getOrDefault = async (key, cbOrValue, expire) => {
 
 /**
  * remove value from cache
- * @param {*} key
+ * @param {string} key
  */
 const remove = async (key) => {
   throw new Error("Method not implemented.");
