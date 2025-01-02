@@ -1,7 +1,6 @@
 const fs = require("fs");
 const cron = require("node-cron");
 const { logger } = require("../helpers/logging");
-require("./stale-user-access");
 
 /**
  * @typedef {Object} CronJob
