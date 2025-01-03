@@ -4,7 +4,7 @@ const {
   CRON_AS_DAEMON,
 } = require("./startup/environment");
 const server = require("./server");
-const { logger } = require("./helpers/logging");
+const { plogger } = require("./helpers/logging");
 
 // better to use cluster module to take advantage of multi-core systems
 // downside is that it's a bit more complex to manage and TLS is not supported
@@ -33,18 +33,18 @@ const startChild = (script, enable, respawn = true) => {
   if (enable) {
     let child = child_process.fork(script);
     child.on("spawn", () => {
-      logger.info(`PID ${child.pid} spawned, script: ${script}`);
+      plogger.info(`PID ${child.pid} spawned, script: ${script}`);
     });
     child.on("exit", (code) => {
       children.pop(child);
       if (code != 0 && respawn) {
-        logger.warn(`PID ${child.pid} exited with code ${code}, respawning..`);
+        plogger.warn(`PID ${child.pid} exited with code ${code}, respawning..`);
         child = child_process.fork(script);
         children.push(child);
       }
     });
   } else {
-    logger.warn(`${script} is disabled`);
+    plogger.warn(`${script} is disabled`);
   }
 };
 
@@ -55,10 +55,10 @@ const startChild = (script, enable, respawn = true) => {
  */
 const gracefulShutdown = (signal) => () => {
   if (cluster.isPrimary) {
-    logger.warn(`Received ${signal}. Shutting down gracefully.`);
+    plogger.warn(`Received ${signal}. Shutting down gracefully.`);
 
     let timeout = 10;
-    logger.warn(
+    plogger.warn(
       `Waiting for ${onlineWorkers} worker/s to shutdown. timeout: ${timeout}s`
     );
 
@@ -74,7 +74,7 @@ const gracefulShutdown = (signal) => () => {
     setInterval(() => {
       timeout -= 1;
       if (timeout === 0) {
-        logger.warn("Forcing shutdown");
+        plogger.warn("Forcing shutdown");
         process.exit(1);
       } else if (onlineWorkers === 0) {
         process.exit(0);
@@ -89,10 +89,10 @@ const gracefulShutdown = (signal) => () => {
 
 if (cluster.isPrimary) {
   const numCPUs = require("os").cpus().length;
-  logger.info(`Master PID ${process.pid} is running`);
+  plogger.info(`Master PID ${process.pid} is running`);
 
   if (CLUSTER_SIZE > numCPUs) {
-    logger.warn(
+    plogger.warn(
       `${CLUSTER_SIZE} is greater than available CPUs ${numCPUs}. Using ${numCPUs} instead`
     );
   }
@@ -102,7 +102,7 @@ if (cluster.isPrimary) {
   }
 
   cluster.on("online", (worker) => {
-    logger.info(
+    plogger.info(
       `PID ${worker.process.pid} is online, listening on port ${SERV_PORT}`
     );
     onlineWorkers++;
@@ -114,14 +114,14 @@ if (cluster.isPrimary) {
   });
 
   cluster.on("exit", (worker, code, signal) => {
-    logger.warn(
+    plogger.warn(
       `PID ${worker.process.pid} exited with code ${code}, signal ${signal}`
     );
     onlineWorkers--;
 
     // attempt to respawn the worker
     if (!signal && code == 1) {
-      logger.warn("respawn worker");
+      plogger.warn("respawn worker");
       cluster.fork();
     }
   });
@@ -129,7 +129,7 @@ if (cluster.isPrimary) {
   process.on("SIGTERM", gracefulShutdown("SIGTERM"));
   process.on("SIGINT", gracefulShutdown("SIGINT"));
   process.on("exit", (code) => {
-    logger.warn(`Master PID ${process.pid} exited with code ${code}`);
+    plogger.warn(`Master PID ${process.pid} exited with code ${code}`);
   });
 } else {
   server.listen(SERV_PORT);

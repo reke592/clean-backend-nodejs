@@ -1,6 +1,6 @@
 const redis = require("redis");
 const implement = require("./cache-interface");
-const { logger } = require("../../helpers/logging");
+const { plogger } = require("../../helpers/logging");
 const { config } = require("../../startup/environment");
 
 let isReady = false;
@@ -12,7 +12,7 @@ const client = redis.createClient({
 });
 
 client.on("ready", () => {
-  logger.info(`PID ${process.pid}, redis connection ready`);
+  plogger.info(`PID ${process.pid}, redis connection ready`);
   clearInterval(interval);
   interval = null;
   lastError = null;
@@ -24,10 +24,10 @@ client.on("error", (err) => {
   lastError = err;
   // throttle error logging
   if (!interval) {
-    logger.error(`PID ${process.pid}, redis: ${lastError.code}`);
+    plogger.error(`PID ${process.pid}, redis: ${lastError}`);
     interval = setInterval(() => {
       if (!isReady) {
-        logger.warn(
+        plogger.warn(
           `PID ${process.pid}, redis connection error: ${lastError.code}`
         );
       }
@@ -38,7 +38,7 @@ client.on("error", (err) => {
 client.connect();
 
 const shutdown = (signal) => async () => {
-  logger.warn(
+  plogger.warn(
     `PID ${process.pid} received ${signal}, closing redis connection.`
   );
   client.quit();

@@ -31,6 +31,21 @@ const logger = createLogger({
   ],
 });
 
+const plogger = createLogger({
+  format: combine(timestamp(), json()),
+  transports: [
+    // TODO: http transport for production environment
+    consoleTransport,
+    new DailyRotateFile({
+      filename: `${LOGS_DIR}/%DATE%-process-${LOG_FILENAME}`,
+      zippedArchive: true,
+      maxSize: LOG_MAX_SIZE,
+      maxFiles: LOG_RETENTION,
+    }),
+  ],
+});
+
 module.exports = {
   logger,
+  plogger,
 };
