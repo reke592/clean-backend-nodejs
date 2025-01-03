@@ -33,6 +33,7 @@ services:
     environment:
       - MYSQL_DATABASE=development
       - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/mysql-root
+    command: --default-authentication-plugin=mysql_native_password
     volumes:
       - ./.secrets/mysql-root:/run/secrets/mysql-root
       - ./.container/mysql:/var/lib/mysql
