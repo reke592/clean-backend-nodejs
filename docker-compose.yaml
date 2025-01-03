@@ -1,11 +1,12 @@
 services:
   # nodejs backend
-  app-backend:
+  backend:
     image: node:20.18.0-alpine
     env_file:
       - .env
     volumes:
       - ./src:/app/src
+      - ./config:/app/config
       - ./package.json:/app/package.json
       - ./package-lock.json:/app/package-lock.json
       - ./node_modules:/app/node_modules
@@ -22,6 +23,17 @@ services:
       - ./.container/redis/data:/data
     ports:
       - "6379:6379"
+
+  mysql:
+    image: mysql:8.0.40
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_DATABASE=development
+      - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/mysql-root
+    volumes:
+      - ./.secrets/mysql-root:/run/secrets/mysql-root
+      - ./.container/mysql:/var/lib/mysql
 
   # reverse proxy
   nginx:

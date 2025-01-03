@@ -5,5 +5,6 @@
 /.container/
 /config/*.json
 .env
+.secrets/
 
 !/config/default.json
