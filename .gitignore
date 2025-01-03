@@ -3,4 +3,7 @@
 /data/
 /tmp/
 /.container/
+/config/*.json
 .env
+
+!/config/default.json

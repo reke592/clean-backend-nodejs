@@ -1,0 +1,17 @@
+{
+  "redis": {
+    "url": "redis://localhost:6379"
+  },
+  "database": {
+    "client": "sqlite3",
+    "name": "development",
+    "port": null,
+    "host": null,
+    "username": null,
+    "password": null,
+    "pool": {
+      "min": 2,
+      "max": 10
+    }
+  }
+}

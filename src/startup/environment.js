@@ -14,6 +14,7 @@ if (fs.existsSync(envFile)) {
   require("dotenv").config({ path: envFile });
 }
 
+const config = require("config");
 const isProduction = process.env.NODE_ENV === "production";
 
 /**
@@ -88,6 +89,7 @@ const CRON_CHECK_STALE_USER_ACCESS = cronScheduleOrDefault(
 const LOG_REQUESTS = isAgreed(process.env.LOG_REQUESTS);
 
 module.exports = {
+  config,
   isProduction,
   SERV_PORT,
   CLUSTER_SIZE,

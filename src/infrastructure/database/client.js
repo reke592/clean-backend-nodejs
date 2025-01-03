@@ -1,5 +1,5 @@
 const knex = require("knex");
-const { DATA_DIR } = require("../../startup/environment");
+const { config, DATA_DIR } = require("../../startup/environment");
 const { mkdirSync } = require("../../helpers/directories");
 
 const migrationsDir = mkdirSync(__dirname + "/schema/migrations");
@@ -9,11 +9,19 @@ const seedsDir = mkdirSync(__dirname + "/schema/seeds");
  * database client using knex library
  */
 const client = knex({
-  client: "sqlite3",
-  useNullAsDefault: true,
+  client: config.get("database.client"),
+  useNullAsDefault: config.get("database.client") === "sqlite3",
   connection: {
-    filename: `${DATA_DIR}/db.sqlite`,
-    database: "app_db",
+    filename: `${DATA_DIR}/${config.get("database.name")}.sqlite`,
+    database: config.get("database.name"),
+    host: config.get("database.host"),
+    port: config.get("database.port"),
+    user: config.get("database.username"),
+    password: config.get("database.password"),
+    pool: {
+      min: config.get("database.pool.min"),
+      max: config.get("database.pool.max"),
+    },
   },
   migrations: {
     directory: migrationsDir,

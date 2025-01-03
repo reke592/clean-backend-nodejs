@@ -1,6 +1,7 @@
 const fs = require("fs");
 const cron = require("node-cron");
 const { logger } = require("../helpers/logging");
+const { cache } = require("../infrastructure/cache");
 
 /**
  * @typedef {Object} CronJob

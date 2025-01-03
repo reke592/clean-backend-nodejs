@@ -16,6 +16,13 @@ services:
     working_dir: /app
     command: npm run dev
 
+  redis:
+    image: redis:6.2.5-alpine
+    volumes:
+      - ./.container/redis/data:/data
+    ports:
+      - "6379:6379"
+
   # reverse proxy
   nginx:
     profiles:
