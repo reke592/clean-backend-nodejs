@@ -17,6 +17,7 @@ services:
     working_dir: /app
     command: npm run dev
 
+  # central cache
   redis:
     image: redis:6.2.5-alpine
     volumes:
@@ -24,6 +25,7 @@ services:
     ports:
       - "6379:6379"
 
+  # database
   mysql:
     image: mysql:8.0.40
     ports:
