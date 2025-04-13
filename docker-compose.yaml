@@ -1,7 +1,9 @@
 services:
   # nodejs backend
   backend:
-    image: node:20.18.0-alpine
+    build:
+      context: .
+      dockerfile: Dockerfile
     env_file:
       - .env
     volumes:
